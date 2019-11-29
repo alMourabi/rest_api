@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+
 class AuthController extends Controller
 {
     /**
@@ -11,9 +14,9 @@ class AuthController extends Controller
      *
      * @param  [string] fname
      * @param  [string] lname
-     * @param  [string] number
+     * @param  [string] phone
      * @param  [string] birthday
-     * @param  [string] class
+     * @param  [string] grade
      * @param  [string] establishment
      * @param  [string] region
      * @param  [string] email
@@ -26,9 +29,9 @@ class AuthController extends Controller
         $request->validate([
             'fname' => 'required|string',
             'lname' => 'required|string',
-            'number' => 'required|string',
+            'phone' => 'required|string',
             'birthday' => 'required|string',
-            'class' => 'required|string',
+            'grade' => 'required|string',
             'establishment' => 'required|string',
             'region' => 'required|string',
             'email' => 'required|string|email|unique:users',
@@ -37,9 +40,9 @@ class AuthController extends Controller
         $user = new User([
             'fname' => $request->lname,
             'lname' => $request->fname,
-            'number' => $request->number,
+            'phone' => $request->phone,
             'birthday' => $request->birthday,
-            'class' => $request->class,
+            'grade' => $request->grade,
             'establishment' => $request->establishment,
             'region' => $request->region,
             'email' => $request->email,
@@ -50,7 +53,7 @@ class AuthController extends Controller
             'message' => 'Successfully created user!'
         ], 201);
     }
-  
+
     /**
      * Login user and create token
      *
@@ -69,7 +72,7 @@ class AuthController extends Controller
             'remember_me' => 'boolean'
         ]);
         $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
+        if (!Auth::attempt($credentials))
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
@@ -87,7 +90,7 @@ class AuthController extends Controller
             )->toDateTimeString()
         ]);
     }
-  
+
     /**
      * Logout user (Revoke the token)
      *
@@ -100,7 +103,7 @@ class AuthController extends Controller
             'message' => 'Successfully logged out'
         ]);
     }
-  
+
     /**
      * Get the authenticated User
      *
