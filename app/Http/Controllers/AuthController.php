@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -24,31 +26,13 @@ class AuthController extends Controller
      * @param  [string] password_confirmation
      * @return [string] message
      */
-    public function signup(Request $request)
+    public function signup(CreateUser $request)
     {
-        $request->validate([
-            'fname' => 'required|string',
-            'lname' => 'required|string',
-            'phone' => 'required|string',
-            'birthday' => 'required|string',
-            'grade' => 'required|string',
-            'establishment' => 'required|string',
-            'region' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed'
-        ]);
-        $user = new User([
-            'fname' => $request->lname,
-            'lname' => $request->fname,
-            'phone' => $request->phone,
-            'birthday' => $request->birthday,
-            'grade' => $request->grade,
-            'establishment' => $request->establishment,
-            'region' => $request->region,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
+        $validated = $request->validated();
+        $validated['password'] = Hash::make($validated['password']);
+        $user = new User($validated);
         $user->save();
+        $user->sendEmailVerificationNotification();
         return response()->json([
             'message' => 'Successfully created user!'
         ], 201);
@@ -113,4 +97,22 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+
+    /**
+     * 
+     * Update user
+     * 
+     */
+
+    public function updateUser(Request $request, User $user){
+        $user->update($request->all());
+        return $user;
+    }
+
+    /**
+     * 
+     * Send password reset e-mail
+     * 
+     */
 }

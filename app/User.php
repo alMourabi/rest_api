@@ -6,8 +6,9 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-
-class User extends Authenticatable
+// use App\Notifications\VerifyEmail;
+use Illuminate\Auth\Notifications\VerifyEmail;
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable;
 
@@ -17,14 +18,14 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'fname', 
-        'lname', 
-        'phone', 
-        'birthday', 
+        'fname',
+        'lname',
+        'phone',
+        'birthday',
         'grade',
-        'establishment', 
-        'region', 
-        'email', 
+        'establishment',
+        'region',
+        'email',
         'password',
     ];
 
@@ -45,4 +46,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmail); // my notification
+    }
 }
