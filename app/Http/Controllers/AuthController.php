@@ -106,7 +106,7 @@ class AuthController extends Controller
      */
 
     public function updateUser(Request $request, User $user){
-        $user->update($request->all());
+        $user->update($request->except('email'));
         return $user;
     }
 
