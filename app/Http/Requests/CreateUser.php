@@ -35,7 +35,7 @@ class CreateUser extends FormRequest
             'establishment' => 'required|string',
             'region' => 'required|string',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|min:8|confirmed'
         ];
     }
 

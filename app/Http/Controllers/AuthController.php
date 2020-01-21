@@ -106,8 +106,29 @@ class AuthController extends Controller
      */
 
     public function updateUser(Request $request, User $user){
-        $user->update($request->except('email'));
+        $validatedData = $request->validate([
+            'fname' => 'nullable|string',
+            'lname' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'birthday' => 'nullable|string',
+            'grade' => 'nullable|string',
+            'establishment' => 'nullable|string',
+            'region' => 'nullable|string',
+        ]);
+        $user->update(array_filter($validatedData));
+        $user->save();
         return $user;
+    }
+
+    public function checkPassword(Request $request){
+        // $validatedData = $request->validate([
+        //     'password'=>'required'
+        // ]);
+        $v = Hash::check($request->input('password'), Auth::user()->password);
+        return response()->json([
+            'check'=>$v
+        ]);
+
     }
 
     /**
