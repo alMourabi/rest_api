@@ -28,6 +28,7 @@ Route::group([
         Route::get('logout', 'AuthController@logout');
         Route::get('user', 'AuthController@user');
         Route::post('password_check', 'AuthController@checkPassword');
+        Route::post('password_update', 'AuthController@updatePassword');
         Route::put('user/{user}', 'AuthController@updateUser');
     });
 });

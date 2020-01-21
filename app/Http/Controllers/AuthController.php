@@ -131,9 +131,17 @@ class AuthController extends Controller
 
     }
 
-    /**
-     * 
-     * Send password reset e-mail
-     * 
-     */
+    public function updatePassword(Request $request){
+        $validatedData = $request->validate([
+            'old_password'=>'required',
+            'password'=>'required|min:8|confirmed',
+        ]);
+        if(Hash::check($validatedData['old_password'],Auth::user()->password)){
+            $user = User::find(Auth::user()->id);
+            $user->password = Hash::make($validatedData['password']);
+            $user->save();
+            return response()->json(['success'=>'Password updated with success']);
+        }
+        return response()->json(['error'=>'Wrong password'],401);
+    }
 }
