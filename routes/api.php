@@ -32,6 +32,11 @@ Route::group([
         Route::put('user/{user}', 'AuthController@updateUser');
     });
 });
+
+Route::group(['middleware'=>'auth:api'], function(){
+    Route::resource('class_picture', 'ClassPictureController');
+});
+
 Route::get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
 Route::get('email/verify/{id}', 'Auth\VerificationController@verify')->name('verification.verify');
 Route::get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
