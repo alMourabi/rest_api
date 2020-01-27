@@ -12,6 +12,8 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable;
 
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -48,6 +50,25 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     
+    public function set(){
+        if(ClassPDF::where(['class' => request()->input('class')])->count()!=0)
+        $this->pdf = ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
+        if(ClassPicture::where(['class' => request()->input('class')])->count()!=0)
+        $this->image = ClassPicture::where(['class' => request()->input('class')])->first()->image;
+    }
+
+    public function image(){
+        if(ClassPicture::where(['class' => request()->input('class')])->count()!=0)
+        return ClassPicture::where(['class' => request()->input('class')])->first()->image;
+        return '';
+    }
+    
+    public function pdf(){
+        if(ClassPDF::where(['class' => request()->input('class')])->count()!=0)
+        return ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
+        return '';
+    }
+
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail); // my notification

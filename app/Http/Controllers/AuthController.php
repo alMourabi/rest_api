@@ -31,8 +31,8 @@ class AuthController extends Controller
         $validated = $request->validated();
         $validated['password'] = Hash::make($validated['password']);
         $user = new User($validated);
-        $user->sendEmailVerificationNotification();
         $user->save();
+        // $user->sendEmailVerificationNotification();
         return response()->json([
             'message' => 'Successfully created user!'
         ], 201);
@@ -95,7 +95,6 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
-
         return response()->json($request->user());
     }
 
@@ -106,7 +105,8 @@ class AuthController extends Controller
      * 
      */
 
-    public function updateUser(Request $request, User $user){
+    public function updateUser(Request $request, User $user)
+    {
         $validatedData = $request->validate([
             'fname' => 'nullable|string',
             'lname' => 'nullable|string',
@@ -121,28 +121,29 @@ class AuthController extends Controller
         return $user;
     }
 
-    public function checkPassword(Request $request){
+    public function checkPassword(Request $request)
+    {
         // $validatedData = $request->validate([
         //     'password'=>'required'
         // ]);
         $v = Hash::check($request->input('password'), Auth::user()->password);
         return response()->json([
-            'check'=>$v
+            'check' => $v
         ]);
-
     }
 
-    public function updatePassword(Request $request){
+    public function updatePassword(Request $request)
+    {
         $validatedData = $request->validate([
-            'old_password'=>'required',
-            'password'=>'required|min:8|confirmed',
+            'old_password' => 'required',
+            'password' => 'required|min:8|confirmed',
         ]);
-        if(Hash::check($validatedData['old_password'],Auth::user()->password)){
+        if (Hash::check($validatedData['old_password'], Auth::user()->password)) {
             $user = User::find(Auth::user()->id);
             $user->password = Hash::make($validatedData['password']);
             $user->save();
-            return response()->json(['success'=>'Password updated with success']);
+            return response()->json(['success' => 'Password updated with success']);
         }
-        return response()->json(['error'=>'Wrong password'],401);
+        return response()->json(['error' => 'Wrong password'], 401);
     }
 }
