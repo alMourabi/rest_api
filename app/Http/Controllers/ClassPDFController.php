@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\ClassPicture;
+use App\ClassPDF;
 use Illuminate\Http\Request;
 
-class ClassPictureController extends Controller
+class ClassPDFController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class ClassPictureController extends Controller
     {
         //
         return response()->json([
-            'image' => ClassPicture::where(['class' => request()->input('class')])->first()->image
+            'pdf' => ClassPDF::where(['class' => request()->input('class')])->first()->pdf
         ]);
     }
 
@@ -44,10 +44,10 @@ class ClassPictureController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\ClassPicture  $classPicture
+     * @param  \App\ClassPDF  $classPDF
      * @return \Illuminate\Http\Response
      */
-    public function show(ClassPicture $classPicture)
+    public function show(ClassPDF $classPDF)
     {
         //
     }
@@ -55,10 +55,10 @@ class ClassPictureController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\ClassPicture  $classPicture
+     * @param  \App\ClassPDF  $classPDF
      * @return \Illuminate\Http\Response
      */
-    public function edit(ClassPicture $classPicture)
+    public function edit(ClassPDF $classPDF)
     {
         //
     }
@@ -67,10 +67,10 @@ class ClassPictureController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ClassPicture  $classPicture
+     * @param  \App\ClassPDF  $classPDF
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ClassPicture $classPicture)
+    public function update(Request $request, ClassPDF $classPDF)
     {
         //
     }
@@ -78,10 +78,10 @@ class ClassPictureController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\ClassPicture  $classPicture
+     * @param  \App\ClassPDF  $classPDF
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ClassPicture $classPicture)
+    public function destroy(ClassPDF $classPDF)
     {
         //
     }

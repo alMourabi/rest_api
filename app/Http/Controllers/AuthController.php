@@ -31,8 +31,8 @@ class AuthController extends Controller
         $validated = $request->validated();
         $validated['password'] = Hash::make($validated['password']);
         $user = new User($validated);
-        $user->save();
         $user->sendEmailVerificationNotification();
+        $user->save();
         return response()->json([
             'message' => 'Successfully created user!'
         ], 201);
@@ -95,6 +95,7 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
+
         return response()->json($request->user());
     }
 

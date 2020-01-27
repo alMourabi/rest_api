@@ -35,6 +35,7 @@ Route::group([
 
 Route::group(['middleware'=>'auth:api'], function(){
     Route::resource('class_picture', 'ClassPictureController');
+    Route::resource('class_pdf', 'ClassPDFController');
 });
 
 Route::get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
