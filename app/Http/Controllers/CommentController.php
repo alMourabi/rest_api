@@ -36,8 +36,8 @@ class CommentController extends Controller
             return response()->json(['error' => 'Unauthorized']);
 
         $validated = Validator::make($request->all(), [
-            'video_id'=>'required|integer', 
-            'text'=>'required', 
+            'video_id' => 'required|integer',
+            'text' => 'required',
             // 'comment_id'=>'nullable|integer',
         ], [
             'required' => 'L\'attribut :attribute est impératif.',
@@ -50,7 +50,7 @@ class CommentController extends Controller
         }
         $data = $request->all();
         $comment = new Comment($data);
-        $comment->name = Auth::user()->fname." ".Auth::user()->lname;
+        $comment->name = Auth::user()->fname . " " . Auth::user()->lname;
         $comment->user_id = Auth::user()->id;
 
         $comment->save();
@@ -80,7 +80,7 @@ class CommentController extends Controller
     {
         //
 
-        if (Auth::user()->admin == 0)
+        if (Auth::user()->admin == 0 || Auth::user()->id != $comment->user_id)
             return response()->json(['error' => 'Unauthorized']);
 
         // $validated = Validator::make($request->all(), [
@@ -112,11 +112,11 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         //
-        if (Auth::user()->admin != 2 || $comment->user_id!=Auth::user()->id)
+        if (Auth::user()->admin != 2 || $comment->user_id != Auth::user()->id)
             return response()->json(['error' => 'Unauthorized']);
 
-				foreach($comment->comments as $c)
-					$this->destroy($c);		
+        foreach ($comment->comments as $c)
+            $this->destroy($c);
         $comment->delete();
         return response()->json(['success' => '1']);
     }
