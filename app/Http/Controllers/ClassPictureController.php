@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ClassPicture;
 use Illuminate\Http\Request;
+use Auth;
 
 class ClassPictureController extends Controller
 {
@@ -39,6 +40,20 @@ class ClassPictureController extends Controller
     public function store(Request $request)
     {
         //
+        $data = [];
+        if (Auth::user()->admin > 0) {
+            if (array_key_exists('image', $request->all())) {
+                $path = $request->file('image')->store('images', 'public');
+                $data['image'] = env("APP_URL", "https://almourabi.com/api") . "/public/storage/" . $path;
+            }
+            $data['class'] = $request->input('class');
+            $image = ClassPicture::where(['class' => $data['class']])->first();
+            if ($image) {
+                $image->image = $data['image'];
+                return $image;
+            }
+            return ClassPicture::create($data);
+        }
     }
 
     /**

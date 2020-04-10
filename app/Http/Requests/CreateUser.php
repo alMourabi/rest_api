@@ -29,11 +29,11 @@ class CreateUser extends FormRequest
             //
             'fname' => 'required|string',
             'lname' => 'required|string',
-            'phone' => 'required|string',
-            'birthday' => 'required|string',
+            'phone' => 'nullable|string',
+            'birthday' => 'nullable|string',
             'grade' => 'required|string',
-            'establishment' => 'required|string',
-            'region' => 'required|string',
+            'establishment' => 'nullable|string',
+            'region' => 'nullable|string',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:8|confirmed'
         ];

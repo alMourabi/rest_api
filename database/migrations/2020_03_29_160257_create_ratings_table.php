@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateClassPDFSTable extends Migration
+class CreateRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,15 @@ class CreateClassPDFSTable extends Migration
      */
     public function up()
     {
-        Schema::create('class_p_d_f_s', function (Blueprint $table) {
+        Schema::create('ratings', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('class', 255);
-            $table->string('pdf', 255);
+            $table->unsignedBigInteger('video_id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('name');
+            $table->text('text')->nullable()->default(null);
+            $table->unsignedTinyInteger('rating');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -28,6 +32,6 @@ class CreateClassPDFSTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('class_p_d_f_s');
+        Schema::dropIfExists('ratings');
     }
 }

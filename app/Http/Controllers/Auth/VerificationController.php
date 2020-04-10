@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Auth\Events\Verified;
 
 class VerificationController extends Controller
 {
-    use VerifiesEmails;
+    // use VerifiesEmails;
 
     /**
      * Show the email verification notice.
@@ -26,16 +27,20 @@ class VerificationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function verify(Request $request)
+    public function verify(Request $request, $id)
     {
+
+        // dd("sss");
         // ->route('id') gets route user id and getKey() gets current user id() 
-        // do not forget that you must send Authorization header to get the user from the request
-        if ($request->route('id') == $request->user()->getKey() &&
-            $request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+        // do not forget that you must send Authorization header to get the user from the request   
+        $user = \App\User::findOrFail($id);
+
+        if ($request->route('id') == $user->getKey() &&
+            $user->markEmailAsVerified()) {
+            event(new Verified($user));
         }
 
-        return response()->json('Email verified!');
+        return Redirect::to('https://almourabi.com');
 //        return redirect($this->redirectPath());
     }
 
@@ -65,8 +70,8 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('signed')->only('verify');
+        // $this->middleware('auth');
+        // $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 }

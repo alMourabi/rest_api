@@ -2,12 +2,14 @@
 
 namespace App;
 
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 // use App\Notifications\VerifyEmail;
 use Illuminate\Auth\Notifications\VerifyEmail;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable;
@@ -27,7 +29,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'grade',
         'establishment',
         'region',
+        'subscribed',
+        'subject',
+        'admin',
         'email',
+        'classe_id',
         'password',
     ];
 
@@ -49,28 +55,47 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    
-    public function set(){
-        if(ClassPDF::where(['class' => request()->input('class')])->count()!=0)
-        $this->pdf = ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
-        if(ClassPicture::where(['class' => request()->input('class')])->count()!=0)
-        $this->image = ClassPicture::where(['class' => request()->input('class')])->first()->image;
+		public function subjectclasse(){
+			return $this->hasMany('\App\UserSubjectClasse');
+		}
+
+    public function set()
+    {
+        if (ClassPDF::where(['class' => request()->input('class')])->count() != 0)
+            $this->pdf = ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
+        if (ClassPicture::where(['class' => request()->input('class')])->count() != 0)
+            $this->image = ClassPicture::where(['class' => request()->input('class')])->first()->image;
     }
 
-    public function image(){
-        if(ClassPicture::where(['class' => request()->input('class')])->count()!=0)
-        return ClassPicture::where(['class' => request()->input('class')])->first()->image;
+    public function image()
+    {
+        if (ClassPicture::where(['class' => request()->input('class')])->count() != 0)
+            return ClassPicture::where(['class' => request()->input('class')])->first()->image;
         return '';
     }
-    
-    public function pdf(){
-        if(ClassPDF::where(['class' => request()->input('class')])->count()!=0)
-        return ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
+
+    public function pdf()
+    {
+        if (ClassPDF::where(['class' => request()->input('class')])->count() != 0)
+            return ClassPDF::where(['class' => request()->input('class')])->first()->pdf;
         return '';
     }
+
+		public function classe(){
+			return $this->belongsTo('\App\Classe');
+		}
+
+		public function subjects(){
+			$subjects = Subject::where(['classe_id'=>$this->classe_id])->get();
+			return $subjects;
+		}
 
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail); // my notification
+    }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
     }
 }
