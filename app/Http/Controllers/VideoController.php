@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class VideoController extends Controller
 {
@@ -32,10 +34,10 @@ class VideoController extends Controller
             $videos = $videos->where(['payed' => request()->input('payed')]);
 
         $videos = $videos->get();
-        foreach($videos as $video){
-            $video->pdf=$video->pdf;
-            $video->comments=$video->comments;
-            $video->ratings=$video->ratings;
+        foreach ($videos as $video) {
+            $video->pdf = $video->pdf;
+            $video->comments = $video->comments;
+            $video->ratings = $video->ratings;
         }
 
         return $videos;
@@ -50,17 +52,17 @@ class VideoController extends Controller
     public function store(Request $request)
     {
         //
-        if(Auth::user()->admin==0)
-            return response()->json(['error'=>'Unauthorized']);
+        if (Auth::user()->admin == 0)
+            return response()->json(['error' => 'Unauthorized']);
 
         $validated = Validator::make($request->all(), [
             'title' => 'required',
-            'video'=>'file',
+            'video' => 'file',
             'payed' => 'nullable',
             'description' => 'nullable',
             'subject_id' => 'required|integer',
             'classe_id' => 'required|integer',
-            'type'=>'required'
+            'type' => 'required'
         ], [
             'required' => 'L\'attribut :attribute est impératif.',
             'unique' => 'Cet :attribute est déja utilisé.',
@@ -74,19 +76,18 @@ class VideoController extends Controller
 
         $video = new Video($data);
         $video->user_id = Auth::user()->id;
-        
+
         if (array_key_exists('video', $data)) {
             $path = $request->file('video')->store('videos', 'local');
             $data['url'] = env("APP_URL", "https://almourabi.com/api") . "/public/api/" . $path;
-        }
-        else
-            return response()->json(['error'=>'Please include a video file'], 401);
+        } else
+            return response()->json(['error' => 'Please include a video file'], 401);
 
-				if (array_key_exists('thumbnail', $data)) {
-							$path = $request->file('thumbnail')->store('thumbnails', 'public');
-							$data['thumbnail'] = env("APP_URL", "https://almourabi.com/api") . "/public/storage/" . $path;
-							$video->thumbnail = $data['thumbnail'];
-					}
+        if (array_key_exists('thumbnail', $data)) {
+            $path = $request->file('thumbnail')->store('thumbnails', 'public');
+            $data['thumbnail'] = env("APP_URL", "https://almourabi.com/api") . "/public/storage/" . $path;
+            $video->thumbnail = $data['thumbnail'];
+        }
 
         $video->url = $data['url'];
         $video->save();
@@ -102,22 +103,35 @@ class VideoController extends Controller
     public function show(Video $video)
     {
         //
-        if(!Auth::user()->subscribed && $video->payed)
-            return response()->json(['error'=>'Ce video n\'est disponible que pour les membres abonnées.']);
+        //	    dd(request()->ip());
+        if (!Auth::user()->subscribed && $video->payed)
+            return response()->json(['error' => 'Ce video n\'est disponible que pour les membres abonnées.']);
 
-        $video->pdf=$video->pdf;
-        $video->comments=$video->comments;
-        $video->ratings=$video->ratings;
-        
+        $video->pdf = $video->pdf;
+        $video->comments = $video->comments;
+        $video->ratings = $video->ratings;
+
         return $video;
     }
 
-    public function download($video){
-        // // dd(request()->ip());
-        // if(request()->ip() != "127.0.0.1")
-        //     return 'No video available';
-
-        return response()->file(storage_path().'/app/videos/'.$video, ['Content-Type'=>'video/mp4']);        
+    public function download($video)
+    {
+        // $extention = explode('.', $video)[count(explode('.', $video)) - 1];
+        // $new = Str::random(20) . '.' . $extention;
+        // Storage::copy('videos/' . $video, 'videos/' . $new);
+        $response = response()->file(storage_path() . '/app/videos/' . $video, ['Content-Type' => 'video/mp4']);
+        // $url = env("APP_URL", "http://almourabi.com/api-murabi") . "/public/api/videos";
+        // $v = Video::where(['url' => $url . '/' . $video])->first();
+        // // $v = Video::whereRaw('\'url\' REGEXP \''.$video.'\'')->get();
+        // // return($response);
+        // if($v==null)
+        // return "No video available";
+        // // dd($url . '/' . $new);
+        // // $v = $v[0];
+        // $v->url = $url . '/' . $new;
+        // $v->save();
+        return $response;
+        // Storage::move('app/videos/' . $video, 'app/video/' . $new);
     }
 
     /**
@@ -131,17 +145,17 @@ class VideoController extends Controller
     {
         //
 
-        if(Auth::user()->admin==0)
-            return response()->json(['error'=>'Unauthorized']);
+        if (Auth::user()->admin == 0)
+            return response()->json(['error' => 'Unauthorized']);
 
         $validated = Validator::make($request->all(), [
             'title' => 'nullable',
-            'video'=>'nullable|file',
+            'video' => 'nullable|file',
             'payed' => 'nullable',
             'description' => 'nullable',
             'subject_id' => 'nullable|integer',
             'classe_id' => 'nullable|integer',
-            'type'=>'nullable'
+            'type' => 'nullable'
         ], [
             'required' => 'L\'attribut :attribute est impératif.',
             'unique' => 'Cet :attribute est déja utilisé.',
@@ -153,7 +167,7 @@ class VideoController extends Controller
         }
         $data = $request->all();
         $data = array_filter($data);
-        
+
         if (array_key_exists('video', $data)) {
             $path = $request->file('video')->store('videos', 'local');
             $data['url'] = env("APP_URL", "https://almourabi.com/api") . "/public/api/" . $path;
@@ -173,15 +187,15 @@ class VideoController extends Controller
     public function destroy(Video $video)
     {
         //
-        if(Auth::user()->admin!=2)
-        return response()->json(['error'=>'Unauthorized']);
-				$ctrl = new CommentController();
-				foreach($video->comments as $c)
-					$ctrl->destroy($c);
-				$ctrl = new RatingController();
-				foreach($video->ratings as $r)
-						$ctrl->destroy($r);
+        if (Auth::user()->admin != 2)
+            return response()->json(['error' => 'Unauthorized']);
+        $ctrl = new CommentController();
+        foreach ($video->comments as $c)
+            $ctrl->destroy($c);
+        $ctrl = new RatingController();
+        foreach ($video->ratings as $r)
+            $ctrl->destroy($r);
         $video->delete();
-        return response()->json(['success'=>'1']);
+        return response()->json(['success' => '1']);
     }
 }

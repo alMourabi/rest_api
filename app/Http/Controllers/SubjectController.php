@@ -61,11 +61,9 @@ class SubjectController extends Controller
     public function show(Subject $subject)
     {
         //
-        if(Auth::user()->admin>0){
 						$subject->pdf = $subject->pdf;
 						$subject->videos = $subject->videos;
             return $subject;
-        }
     }
 
     /**
